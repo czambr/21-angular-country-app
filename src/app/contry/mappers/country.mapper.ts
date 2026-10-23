@@ -7,7 +7,7 @@ export class CountryMapper {
       ccn3: data.codes.ccn3,
       flag: data.flag.emoji,
       flgaSvg: data.flag.url_svg,
-      name: data.names.common,
+      name: data.names.translations['spa'].official ?? 'No spanish name',
       capital: data.capitals.map((c) => c.name).join(','),
       population: data.population,
     };
