@@ -1,9 +1,11 @@
-@if (countryResource.error() || !countryResource.hasValue()) {
+@if (countryResource.error() && !countryResource.hasValue()) {
   <app-not-found />
 }
 
 @if (countryResource.isLoading()) {
-  <h1 class="text-3xl">Cargando...</h1>
+  <section class="flex flex-col w-full items-center content-center">
+    <span class="loading loading-ring loading-xl w-52"></span>
+  </section>
 }
 
 @if (countryResource.hasValue()) {

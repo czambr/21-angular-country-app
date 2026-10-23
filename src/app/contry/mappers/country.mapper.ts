@@ -10,6 +10,9 @@ export class CountryMapper {
       name: data.names.translations['spa'].official ?? 'No spanish name',
       capital: data.capitals.map((c) => c.name).join(','),
       population: data.population,
+
+      region: data.region,
+      subRegion: data.subregion,
     };
   }
 
