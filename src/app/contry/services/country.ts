@@ -29,4 +29,20 @@ export class CountryService {
         }),
       );
   }
+
+  searchByContry(query: string) {
+    query = query.toLocaleLowerCase();
+    return this.httpClient
+      .get<RESTCountryResponse>(`${API_URL}/name?q=${query}`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN_API_COUNTRY}`,
+        },
+      })
+      .pipe(
+        map((resp) => CountryMapper.mapRestCountryArrayToCountryArray(resp.data.objects)),
+        catchError(() => {
+          return throwError(() => new Error(`No se pudo obtener el pais buscado ${query}`));
+        }),
+      );
+  }
 }

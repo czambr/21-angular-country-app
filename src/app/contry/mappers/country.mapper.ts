@@ -4,7 +4,7 @@ import { type RestCountry } from '../interfaces/rest-countries.interface';
 export class CountryMapper {
   static mapRestCountryToCountry(data: RestCountry): Country {
     return {
-      ccn3: data.codes.ccn3,
+      ccn3: data.codes.alpha_3,
       flag: data.flag.emoji,
       flgaSvg: data.flag.url_svg,
       name: data.names.translations['spa'].official ?? 'No spanish name',
