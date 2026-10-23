@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, catchError, throwError } from 'rxjs';
 
 import { TOKEN_API_COUNTRY } from '@/envs';
 import { CountryMapper } from '../mappers/country.mapper';
@@ -23,9 +23,10 @@ export class CountryService {
         },
       })
       .pipe(
-        map((restCountries) =>
-          CountryMapper.mapRestCountryArrayToCountryArray(restCountries.data.objects),
-        ),
+        map((resp) => CountryMapper.mapRestCountryArrayToCountryArray(resp.data.objects)),
+        catchError(() => {
+          return throwError(() => new Error(`No se pudo obtener países con ese ${query}`));
+        }),
       );
   }
 }
