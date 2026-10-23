@@ -45,4 +45,23 @@ export class CountryService {
         }),
       );
   }
+
+  searchCountryByAlphaCode(code: string) {
+    code = code.toLocaleLowerCase();
+    return this.httpClient
+      .get<RESTCountryResponse>(`${API_URL}/code?q=${code}`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN_API_COUNTRY}`,
+        },
+      })
+      .pipe(
+        map((resp) => CountryMapper.mapRestCountryArrayToCountryArray(resp.data.objects)),
+        map((countries) => countries.at(0)),
+        catchError(() => {
+          return throwError(
+            () => new Error(`No se pudo obtener la información del pais con código: ${code}`),
+          );
+        }),
+      );
+  }
 }
