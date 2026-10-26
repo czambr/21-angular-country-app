@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
-import { map, Observable, catchError, throwError } from 'rxjs';
+import { map, Observable, catchError, throwError, of, tap } from 'rxjs';
 
 import { TOKEN_API_COUNTRY } from '@/envs';
 import { CountryMapper } from '../mappers/country.mapper';
@@ -14,8 +14,16 @@ const API_URL = 'https://api.restcountries.com/countries/v5';
 export class CountryService {
   private httpClient = inject(HttpClient);
 
+  // Stores
+  private queryCacheCapital = new Map<string, Country[]>();
+  private queryCacheCountry = new Map<string, Country[]>();
+
   searchByCapital(query: string): Observable<Country[]> {
     query = query.toLocaleLowerCase();
+    if (this.queryCacheCapital.has(query)) {
+      return of(this.queryCacheCapital.get(query) || []);
+    }
+
     return this.httpClient
       .get<RESTCountryResponse>(`${API_URL}/capitals?q=${query}`, {
         headers: {
@@ -24,6 +32,7 @@ export class CountryService {
       })
       .pipe(
         map((resp) => CountryMapper.mapRestCountryArrayToCountryArray(resp.data.objects)),
+        tap((countries) => this.queryCacheCapital.set(query, countries)),
         catchError(() => {
           return throwError(() => new Error(`No se pudo obtener países con ese ${query}`));
         }),
@@ -32,6 +41,10 @@ export class CountryService {
 
   searchByContry(query: string) {
     query = query.toLocaleLowerCase();
+    if (this.queryCacheCountry.has(query)) {
+      return of(this.queryCacheCountry.get(query) || []);
+    }
+
     return this.httpClient
       .get<RESTCountryResponse>(`${API_URL}/name?q=${query}`, {
         headers: {
@@ -40,6 +53,7 @@ export class CountryService {
       })
       .pipe(
         map((resp) => CountryMapper.mapRestCountryArrayToCountryArray(resp.data.objects)),
+        tap((countries) => this.queryCacheCountry.set(query, countries)),
         catchError(() => {
           return throwError(() => new Error(`No se pudo obtener el pais buscado ${query}`));
         }),
