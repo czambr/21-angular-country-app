@@ -17,7 +17,9 @@ export class CountryService {
   // Stores
   private queryCacheCapital = new Map<string, Country[]>();
   private queryCacheCountry = new Map<string, Country[]>();
+  private queryCacheByRegion = new Map<string, Country[]>();
 
+  // Methdos for search
   searchByCapital(query: string): Observable<Country[]> {
     query = query.toLocaleLowerCase();
     if (this.queryCacheCapital.has(query)) {
@@ -75,6 +77,26 @@ export class CountryService {
           return throwError(
             () => new Error(`No se pudo obtener la información del pais con código: ${code}`),
           );
+        }),
+      );
+  }
+
+  searchByRegion(region: string) {
+    if (this.queryCacheByRegion.has(region)) {
+      return of(this.queryCacheByRegion.get(region) || []);
+    }
+
+    return this.httpClient
+      .get<RESTCountryResponse>(`${API_URL}/region/${region}`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN_API_COUNTRY}`,
+        },
+      })
+      .pipe(
+        map((resp) => CountryMapper.mapRestCountryArrayToCountryArray(resp.data.objects)),
+        tap((countries) => this.queryCacheByRegion.set(region, countries)),
+        catchError(() => {
+          return throwError(() => new Error(`No se pudo obtener la region buscada ${region}`));
         }),
       );
   }
